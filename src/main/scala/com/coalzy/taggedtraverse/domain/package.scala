@@ -11,12 +11,10 @@ package object domain {
     def tagGroups: List[TagGroup[TAG]]
   }
 
-  trait ChildlessNode[ID, TAG] extends Node[ID, TAG] {
-    def updateTagGroups(f: List[TagGroup[TAG]] => List[TagGroup[TAG]]): ChildlessNode[ID, TAG]
-  }
+  trait BasicNode[ID, TAG] extends Node[ID, TAG]
 
   trait RecursiveNode[ID, TAG] extends Node[ID, TAG] {
-    def friends: List[RecursiveNode[ID, TAG]]
+    def children: List[RecursiveNode[ID, TAG]]
   }
 
 }

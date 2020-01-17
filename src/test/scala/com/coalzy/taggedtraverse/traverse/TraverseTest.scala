@@ -3,8 +3,8 @@ package com.coalzy.taggedtraverse.traverse
 import java.util.UUID
 
 import com.coalzy.taggedtraverse.example._
-import org.scalatest.Matchers
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 class TraverseTest extends AnyFunSuite with Matchers {
 
@@ -23,7 +23,7 @@ class TraverseTest extends AnyFunSuite with Matchers {
   private def testFriendship(person: Person, friendships: Map[UUID, Set[PersonNode]]) =
     sut.traverseNodes[PersonNode, PersonNode](person.toNode())(
       p => friendships.getOrElse(p.id, Set()),
-      (p, friends) => PersonNode(p.id, p.tagGroups, friends.toList)
+      (p, friends, tagGroups) => PersonNode(p.id, tagGroups, friends.toList)
     )
 
   test("keeps overlapping friends") {
@@ -33,7 +33,7 @@ class TraverseTest extends AnyFunSuite with Matchers {
 
     val result = testFriendship(steve, friendships)
 
-    result.friends.head.id shouldBe gregory.id
+    result.children.head.id shouldBe gregory.id
   }
 
   test("ignores friends with no overlaps") {
@@ -43,7 +43,7 @@ class TraverseTest extends AnyFunSuite with Matchers {
 
     val result = testFriendship(steve, friendships)
 
-    result.friends shouldBe Nil
+    result.children shouldBe Nil
   }
 
   test("ignores friends with overlap but split over different groups") {
@@ -53,7 +53,7 @@ class TraverseTest extends AnyFunSuite with Matchers {
 
     val result = testFriendship(steve, friendships)
 
-    result.friends shouldBe Nil
+    result.children shouldBe Nil
   }
 
   test("handles multiple friends") {
@@ -65,7 +65,7 @@ class TraverseTest extends AnyFunSuite with Matchers {
 
     val result = testFriendship(looseygoosey, friendships)
 
-    result.friends.map(_.id) should contain theSameElementsAs List(steve.id, andrew.id)
+    result.children.map(_.id) should contain theSameElementsAs List(steve.id, andrew.id)
   }
 
   test("handles multiple depths of friends") {
@@ -77,9 +77,9 @@ class TraverseTest extends AnyFunSuite with Matchers {
 
     val result = testFriendship(looseygoosey, friendships)
 
-    result.friends.map(_.id) should contain theSameElementsAs List(steve.id)
-    result.friends.flatMap(_.friends.map(_.id)) should contain theSameElementsAs List(gregory.id)
-    result.friends.flatMap(_.friends.flatMap(_.friends)) shouldBe Nil
+    result.children.map(_.id) should contain theSameElementsAs List(steve.id)
+    result.children.flatMap(_.children.map(_.id)) should contain theSameElementsAs List(gregory.id)
+    result.children.flatMap(_.children.flatMap(_.children)) shouldBe Nil
   }
 
 
@@ -93,9 +93,9 @@ class TraverseTest extends AnyFunSuite with Matchers {
 
     val result = testFriendship(looseygoosey, friendships)
 
-    result.friends.map(_.id) should contain theSameElementsAs List(steve.id, andrew.id)
-    result.friends.map(_.friends.map(_.id)) should contain theSameElementsAs List(List(gregory.id), Nil)
-    result.friends.flatMap(_.friends.flatMap(_.friends)) shouldBe Nil
+    result.children.map(_.id) should contain theSameElementsAs List(steve.id, andrew.id)
+    result.children.map(_.children.map(_.id)) should contain theSameElementsAs List(List(gregory.id), Nil)
+    result.children.flatMap(_.children.flatMap(_.children)) shouldBe Nil
   }
 
 

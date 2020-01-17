@@ -2,7 +2,7 @@ package com.coalzy.taggedtraverse
 
 import java.util.UUID
 
-import com.coalzy.taggedtraverse.domain.{ChildlessNode, RecursiveNode, TagGroup, TagType}
+import com.coalzy.taggedtraverse.domain.{BasicNode, RecursiveNode, TagGroup, TagType}
 
 package object example {
 
@@ -30,11 +30,7 @@ package object example {
     val tagMap: Map[TagType, Set[String]] = Map(Sport -> sports, Season -> seasons)
   }
 
-  case class PersonNode(id: UUID, tagGroups: List[TagGroup[String]], friends: List[PersonNode])
-    extends ChildlessNode[UUID, String] with RecursiveNode[UUID, String] {
-    override def updateTagGroups(f: List[TagGroup[String]] => List[TagGroup[String]]): PersonNode = {
-      this.copy(id, f(tagGroups))
-    }
-  }
+  case class PersonNode(id: UUID, tagGroups: List[TagGroup[String]], children: List[PersonNode])
+    extends RecursiveNode[UUID, String]
 
 }
